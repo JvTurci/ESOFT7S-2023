@@ -1,37 +1,31 @@
-import { Request, Response } from 'express';
-import productService from '../service/productService';
+import { Request, Response} from 'express'
+import productService from '../service/productService'
 
 class ProductController {
-    public async getProducts(req: Request, res : Response) {
-        try{
-            const products = await productService.readProductJsonFile();
-            return res.json(products);
-        }catch(err){
-            return res.status(500).send();
-        }
+    async create(req: Request, res: Response){
+        productService.createProductList(req.body)
+
+        return res.status(201).send()
     }
 
-    public async getProductsStock(req: Request, res : Response){
-        try{
-            const productsStock = await productService.productsStock();
-            return res.json(productsStock);
-        }catch(err){
-            return res.status(500).send();
-        }
+    async list(req: Request, res: Response) {
+        const productList = await productService.findProducts()
+
+        return res.status(200).json(productList)
     }
 
-    public async postProducts(req: Request, res: Response){
-        try{
-            const products : any = await productService.createProductJsonFile(req.body)
+    async getStock(req: Request, res: Response) {
+        const stockList = await productService.getStock()
 
-            if(!products) throw new Error()
-            
-            return res.status(201).send();
-        }catch(err) {
-            
-            return res.status(500).send();
-        }
+        return res.status(200).json(stockList)
     }
+    
+    async getStockValue(req: Request, res: Response) {
+        const stockValue = await productService.getStockValue()
+
+        return res.status(200).json(stockValue)
+    }
+
 }
 
 export default new ProductController()

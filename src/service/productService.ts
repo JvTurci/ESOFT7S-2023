@@ -1,44 +1,60 @@
 import { writeFile, readFile } from 'fs/promises'
 
-class productService{
 
-    public async createProductJsonFile(text : String){
+class ProductService {
+    async createProductList(data) {
+        
+        await writeFile('products.json', JSON.stringify(data, null, 2))
+    }
+
+    async findProducts() {
+
         try {
-            await writeFile('products.json', JSON.stringify(text, null, 2))
-            return "Ok";
-        }
-        catch(err) {
-            console.error('Erro na escrita', err)
-            return
+            const productList = await readFile('products.json', "utf8")
+            return JSON.parse(productList)
+        } catch (error) {
+            throw new Error("Erro ao ler lista de produtos")
         }
     }
 
-    public async readProductJsonFile(){
-        try{
-            const products = await readFile('products.json');
-            return JSON.parse(products.toString('utf8')); 
-        }catch(err){
-            throw new Error(err); 
-        }
-    }
+    async getStock() {
+        try {
+            const productList = await this.findProducts()
 
-    public async productsStock(){
-        try{
-            const products = await this.readProductJsonFile();
-            const productsStock = products.map( product => {
-                return {
-                    nome: product.nome,
-                    qtde: product.qtde,
-                    preco: product.preco, 
-                    valor_estoque: product.qtde * product.preco
+            const productStock = productList.map(produto => {
+                let stock = {
+                    nome: produto.nome,
+                    qtde: produto.qtde,
+                    preco: produto.preco,
+                    valor_stock: produto.qtde * produto.preco
                 }
-            });
+                return stock
+            })
 
-            return productsStock;
-        }catch(err){
-
+            return productStock
+        } catch (error) {
+            throw new Error(error)
         }
     }
+
+    async getStockValue() {
+        const stock = await this.getStock()
+
+        // const stockValue = stock.reduce((acc, atual) => {
+        //     return acc + atual.valor_stock
+
+        // }, 0)
+        const stockValue = stock.reduce((acc, atual) => {
+            acc += atual.valor_stock
+
+            return acc
+
+        }, 0)
+
+        return stockValue
+    }
+
+
 }
 
-export default new productService()
+export default new ProductService()
