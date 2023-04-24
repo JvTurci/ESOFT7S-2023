@@ -1,4 +1,4 @@
-import { UserType } from './types/user.type';
+import { UserType } from '../interfaces/types/user.type';
 import UserModel from './user.schema'
 
 export class UserService {
